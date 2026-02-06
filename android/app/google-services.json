@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "871284244553",
+    "firebase_url": "https://careercoach-a969c-default-rtdb.firebaseio.com",
+    "project_id": "careercoach-a969c",
+    "storage_bucket": "careercoach-a969c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871284244553:android:c33ec959c0b20ec7ee7f98",
+        "android_client_info": {
+          "package_name": "com.careercoach.career_coach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2Ocm1b7IvA6EGvzpqK7Ix_kB4ZSe5ja8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871284244553:android:60569d25847b9d47ee7f98",
+        "android_client_info": {
+          "package_name": "com.vrajesh.Careercoach"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2Ocm1b7IvA6EGvzpqK7Ix_kB4ZSe5ja8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
