@@ -183,7 +183,9 @@ class PrivacySecurityScreen extends StatelessWidget {
         color: cardColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.grey[100]!,
         ),
       ),
       child: ListTile(
@@ -191,7 +193,7 @@ class PrivacySecurityScreen extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppConstants.primaryColor.withOpacity(0.1),
+            color: AppConstants.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: AppConstants.primaryColor, size: 22),

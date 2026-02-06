@@ -108,7 +108,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   CircleAvatar(
                     radius: 25,
-                    backgroundColor: AppConstants.primaryColor.withOpacity(0.2),
+                    backgroundColor: AppConstants.primaryColor.withValues(
+                      alpha: 0.2,
+                    ),
                     child: const Icon(
                       LucideIcons.user,
                       color: AppConstants.primaryColor,
@@ -124,7 +126,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      color: Colors.black.withValues(
+                        alpha: isDark ? 0.3 : 0.05,
+                      ),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -190,8 +194,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         onSelected: (selected) {
                           setState(() => _selectedField = field);
                         },
-                        selectedColor: AppConstants.primaryColor.withOpacity(
-                          0.2,
+                        selectedColor: AppConstants.primaryColor.withValues(
+                          alpha: 0.2,
                         ),
                         checkmarkColor: AppConstants.primaryColor,
                         labelStyle: TextStyle(
@@ -215,7 +219,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: isSelected
                                 ? AppConstants.primaryColor
                                 : isDark
-                                ? Colors.white.withOpacity(0.1)
+                                ? Colors.white.withValues(alpha: 0.1)
                                 : Colors.grey[200]!,
                           ),
                         ),
@@ -301,7 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -359,11 +363,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           color: cardColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : Colors.grey[100]!,
           ),
           boxShadow: [
             BoxShadow(
-              color: domain.color.withOpacity(isDark ? 0.05 : 0.1),
+              color: domain.color.withValues(alpha: isDark ? 0.05 : 0.1),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -375,7 +381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: domain.color.withOpacity(0.15),
+                color: domain.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(domain.icon, color: domain.color, size: 28),

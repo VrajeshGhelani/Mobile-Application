@@ -16,7 +16,6 @@ class AppTheme {
         primary: AppConstants.primaryColor,
         secondary: AppConstants.secondaryColor,
         surface: AppConstants.surfaceColor,
-        background: AppConstants.backgroundColor,
       ),
       textTheme: GoogleFonts.outfitTextTheme(),
       appBarTheme: const AppBarTheme(
@@ -57,8 +56,7 @@ class AppTheme {
         seedColor: AppConstants.primaryColor,
         primary: AppConstants.primaryColor,
         secondary: AppConstants.secondaryColor,
-        surface: const Color(0xFF1E1E1E),
-        background: const Color(0xFF0F172A),
+        surface: const Color(0xFF0F172A),
         brightness: Brightness.dark,
       ),
       textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
@@ -79,7 +77,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Colors.white.withOpacity(0.2)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
         ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(

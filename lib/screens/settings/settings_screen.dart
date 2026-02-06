@@ -99,13 +99,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: themeProvider.isDarkMode
-                    ? Colors.red.withOpacity(0.1)
+                    ? Colors.red.withValues(alpha: 0.1)
                     : Colors.red[50],
                 foregroundColor: Colors.red,
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: Colors.red.withOpacity(0.2)),
+                  side: BorderSide(color: Colors.red.withValues(alpha: 0.2)),
                 ),
                 elevation: 0,
               ),
@@ -209,7 +209,9 @@ class SettingsTile extends StatelessWidget {
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey[100]!,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.grey[100]!,
         ),
       ),
       child: ListTile(
@@ -217,7 +219,7 @@ class SettingsTile extends StatelessWidget {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: AppConstants.primaryColor.withOpacity(0.1),
+            color: AppConstants.primaryColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: AppConstants.primaryColor, size: 22),

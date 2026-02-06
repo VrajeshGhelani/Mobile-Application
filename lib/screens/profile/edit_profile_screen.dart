@@ -172,7 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildLabel('Career Domain'),
               // Dynamically populated from CareerDomainData
               DropdownButtonFormField<String>(
-                value: _selectedDomain,
+                initialValue: _selectedDomain,
                 decoration: _buildInputDecoration(
                   LucideIcons.briefcase,
                   'Select domain',
@@ -196,7 +196,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: domain.color.withOpacity(0.1),
+                            color: domain.color.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

@@ -24,92 +24,148 @@ class _ProgressScreenState extends State<ProgressScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<RoadmapProvider>();
     final progress = provider.overallProgress;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    final overallGradient = LinearGradient(
+      colors: isDark
+          ? [
+              const Color(0xFF1E1B4B), // Deep Indigo
+              const Color(0xFF312E81), // Royal Indigo
+              const Color(0xFF020617), // Rich Black
+            ]
+          : [
+              const Color(0xFF6366F1), // Indigo
+              const Color(0xFF8B5CF6), // Violet
+              const Color(0xFFEC4899), // Pink
+            ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
 
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Your Progress',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colors.onSurface,
+          ),
         ),
         centerTitle: true,
       ),
       body: provider.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(colors.primary),
+              ),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Overall Progress Card
+                  // --- Redesigned Overall Progress Card ---
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 32,
+                      horizontal: 24,
+                    ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          AppConstants.primaryColor,
-                          AppConstants.secondaryColor,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
+                      gradient: overallGradient,
+                      borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: AppConstants.primaryColor.withAlpha(77),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                          color: isDark
+                              ? Colors.black.withValues(alpha: 0.5)
+                              : colors.primary.withValues(alpha: 0.25),
+                          blurRadius: 25,
+                          offset: const Offset(0, 12),
                         ),
                       ],
                     ),
                     child: Column(
                       children: [
-                        const Text(
-                          'Overall Completion',
+                        Text(
+                          'Overall Completion'.toUpperCase(),
                           style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        const SizedBox(height: 20),
+                        Text(
+                          '${(progress * 100).toInt()}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 64,
+                            height: 1,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -2,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Thicker, Modern Progress Bar
+                        Stack(
                           children: [
-                            Text(
-                              '${(progress * 100).toInt()}%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
+                            Container(
+                              height: 14,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            FractionallySizedBox(
+                              widthFactor: progress,
+                              child: Container(
+                                height: 14,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: Colors.white.withAlpha(51),
-                            color: Colors.white,
-                            minHeight: 12,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 32),
+                        // Stats Row with Circular Icon Backgrounds
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildStatItem(
-                              'Completed',
-                              provider.totalCompletedSteps.toString(),
-                              LucideIcons.checkCircle,
+                            Expanded(
+                              child: _buildStatItem(
+                                'Steps Completed',
+                                provider.totalCompletedSteps.toString(),
+                                LucideIcons.checkCircle2,
+                                Colors.white,
+                              ),
                             ),
-                            _buildStatItem(
-                              'Pending',
-                              provider.totalPendingSteps.toString(),
-                              LucideIcons.clock,
+                            Container(
+                              height: 40,
+                              width: 1,
+                              color: Colors.white.withValues(alpha: 0.2),
+                            ),
+                            Expanded(
+                              child: _buildStatItem(
+                                'Steps Pending',
+                                provider.totalPendingSteps.toString(),
+                                LucideIcons.timer,
+                                Colors.white,
+                              ),
                             ),
                           ],
                         ),
@@ -117,9 +173,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const Text(
+                  Text(
                     'Domain Breakdowns',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: colors.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   // Render all domains with their individual progress
@@ -133,9 +193,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: colors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey[100]!),
+                        border: Border.all(
+                          color: colors.outlineVariant.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +207,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: domain.color.withAlpha(26),
+                                  color: domain.color.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Icon(
@@ -158,9 +220,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                               Expanded(
                                 child: Text(
                                   domain.name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: colors.onSurface,
                                   ),
                                 ),
                               ),
@@ -178,7 +241,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                             borderRadius: BorderRadius.circular(5),
                             child: LinearProgressIndicator(
                               value: domainProgress,
-                              backgroundColor: Colors.grey[100],
+                              backgroundColor: colors.surfaceContainerHighest,
                               color: domain.color,
                               minHeight: 8,
                             ),
@@ -187,7 +250,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                           Text(
                             '${domain.steps.where((s) => s.isCompleted).length} of ${domain.steps.length} steps completed',
                             style: TextStyle(
-                              color: Colors.grey[500],
+                              color: colors.onSurfaceVariant,
                               fontSize: 13,
                             ),
                           ),
@@ -202,22 +265,40 @@ class _ProgressScreenState extends State<ProgressScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color contentColor,
+  ) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 24),
-        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: contentColor.withValues(alpha: 0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: contentColor, size: 20),
+        ),
+        const SizedBox(height: 12),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+          style: TextStyle(
+            color: contentColor,
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          label.toUpperCase(),
+          style: TextStyle(
+            color: contentColor.withValues(alpha: 0.6),
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
         ),
       ],
     );

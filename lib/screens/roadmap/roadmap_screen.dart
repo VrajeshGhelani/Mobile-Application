@@ -70,7 +70,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               background: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [domain.color, domain.color.withOpacity(0.7)],
+                    colors: [domain.color, domain.color.withValues(alpha: 0.7)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -79,7 +79,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                   child: Icon(
                     domain.icon,
                     size: 80,
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                   ),
                 ),
               ),
@@ -95,7 +95,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -218,7 +218,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                 width: 2,
                 height: 110,
                 color: isCompleted
-                    ? Colors.green.withOpacity(0.3)
+                    ? Colors.green.withValues(alpha: 0.3)
                     : (isDark ? Colors.grey[800] : Colors.grey[200]),
               ),
           ],
@@ -234,9 +234,9 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isCompleted
-                    ? Colors.green.withOpacity(0.2)
+                    ? Colors.green.withValues(alpha: 0.2)
                     : (isDark
-                          ? Colors.white.withOpacity(0.05)
+                          ? Colors.white.withValues(alpha: 0.05)
                           : Colors.grey[100]!),
               ),
             ),
@@ -275,7 +275,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: domain.color.withOpacity(0.15),
+                            color: domain.color.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
