@@ -20,108 +20,143 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding + 8,
+            vertical: 20,
+          ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 80),
-              // App Logo
+              const SizedBox(height: 60),
+              // --- App Logo & Identity ---
               Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppConstants.primaryColor.withAlpha(26),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.rocket_launch,
-                      size: 40,
-                      color: AppConstants.primaryColor,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: colors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colors.primary.withValues(alpha: 0.1),
+                          width: 8,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.rocket_launch_rounded,
+                        size: 40,
+                        color: colors.primary,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'CareerCoach',
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: colors.primary,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 32),
-              Text(
-                'Welcome Back',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppConstants.primaryColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Sign in to continue your career journey',
-                style: TextStyle(color: Colors.grey[600]),
               ),
               const SizedBox(height: 48),
+
+              Text(
+                'Welcome Back',
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Propel your professional journey forward with intelligent guidance.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: colors.onSurface.withValues(alpha: 0.6),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // --- Input Fields ---
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'example@mail.com',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Professional Email',
+                  hintText: 'name@organization.com',
+                  prefixIcon: Icon(Icons.email_rounded),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
+                decoration: const InputDecoration(
+                  labelText: 'Secure Password',
                   hintText: '••••••••',
-                  prefixIcon: const Icon(Icons.lock_outline),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
-                  ),
+                  prefixIcon: Icon(Icons.lock_rounded),
                 ),
               ),
+
               if (_errorMessage != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 16,
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colors.error.withValues(alpha: 0.2),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 13),
-                      ),
-                    ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_rounded,
+                          color: colors.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 48),
+
+              // --- Actions ---
               CustomButton(
-                text: 'Login',
+                text: 'Authenticate Account',
                 isLoading: _isLoading,
                 onPressed: () async {
                   if (_emailController.text.isEmpty ||
                       _passwordController.text.isEmpty) {
-                    setState(() => _errorMessage = 'Please fill in all fields');
+                    setState(
+                      () =>
+                          _errorMessage = 'Identification credentials required',
+                    );
                     return;
                   }
 
@@ -130,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _errorMessage = null;
                   });
 
-                  final success = await context.read<AuthService>().login(
+                  final error = await context.read<AuthService>().login(
                     _emailController.text,
                     _passwordController.text,
                   );
@@ -138,19 +173,34 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (!context.mounted) return;
 
                   setState(() => _isLoading = false);
-                  if (success) {
+                  if (error == null) {
                     context.go('/dashboard');
                   } else {
-                    setState(() => _errorMessage = 'Invalid email or password');
+                    setState(() => _errorMessage = error);
                   }
                 },
               ),
-              const SizedBox(height: 20),
-              Center(
-                child: TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: const Text('Don\'t have an account? Sign Up'),
-                ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'New to the platform?',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => context.push('/register'),
+                    child: Text(
+                      'Initialize Profile',
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

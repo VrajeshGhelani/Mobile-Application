@@ -47,13 +47,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text(
-          'Your Progress',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: colors.onSurface,
-          ),
-        ),
+        title: Text('Your Progress', style: theme.textTheme.titleLarge),
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
         centerTitle: true,
       ),
       body: provider.isLoading
@@ -92,7 +88,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                         Text(
                           'Overall Completion'.toUpperCase(),
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: Colors.white.withValues(alpha: 0.8),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
@@ -117,7 +113,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                               height: 14,
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                             ),
@@ -193,10 +189,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: colors.surfaceContainerLow,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: colors.outlineVariant.withValues(alpha: 0.5),
+                          color: colors.outline.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Column(

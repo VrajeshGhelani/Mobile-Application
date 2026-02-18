@@ -8,146 +8,125 @@ class PrivacySecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final cardColor = theme.cardTheme.color;
+    final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Privacy & Security',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Privacy & Security', style: theme.textTheme.titleLarge),
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new,
-            size: 20,
-            color: isDark ? Colors.white : Colors.black87,
+            LucideIcons.chevronLeft,
+            size: 24,
+            color: colors.onSurface,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.defaultPadding,
+          vertical: 20,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionHeader(context, 'Security', isDark),
+            _buildSectionHeader(context, 'Security Safeguards'),
             const SizedBox(height: 16),
             _buildSecurityTile(
               context,
               icon: LucideIcons.key,
-              title: 'Change Password',
-              subtitle: 'Update your login credentials',
+              title: 'Reset Access Key',
+              subtitle: 'Update your authentication credentials',
               onTap: () => _showActionSnackBar(
                 context,
-                'Redirecting to Change Password...',
+                'Security link sent to your email! 🔑',
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
             const SizedBox(height: 12),
             _buildSecurityTile(
               context,
               icon: LucideIcons.shieldCheck,
-              title: 'App Lock',
-              subtitle: 'Fingerprint or PIN protection',
-              trailing: Switch.adaptive(
+              title: 'Biometric Lock',
+              subtitle: 'Fingerprint or FaceID protection',
+              trailing: Switch(
                 value: false,
                 onChanged: (val) =>
-                    _showActionSnackBar(context, 'Biometric lock enabled!'),
-                activeTrackColor: AppConstants.primaryColor,
+                    _showActionSnackBar(context, 'Biometrics enabled!'),
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
             const SizedBox(height: 12),
             _buildSecurityTile(
               context,
               icon: LucideIcons.smartphone,
-              title: 'Two-Factor Authentication',
-              subtitle: 'Add an extra layer of security',
-              trailing: Switch.adaptive(
-                value: false,
+              title: 'Double Protection',
+              subtitle: 'Two-factor auth layer active',
+              trailing: Switch(
+                value: true,
                 onChanged: (val) =>
-                    _showActionSnackBar(context, '2FA setup initiated!'),
-                activeTrackColor: AppConstants.primaryColor,
+                    _showActionSnackBar(context, '2FA configuration updated!'),
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
 
             const SizedBox(height: 32),
-            _buildSectionHeader(context, 'Privacy', isDark),
+            _buildSectionHeader(context, 'Data Governance'),
             const SizedBox(height: 16),
             _buildSecurityTile(
               context,
               icon: LucideIcons.database,
-              title: 'Data Usage',
-              subtitle: 'View how we use your career data',
+              title: 'Utilization Insights',
+              subtitle: 'How we process your career data',
               onTap: () => _showInfoDialog(
                 context,
-                'Data Usage',
-                'CareerCoach uses your roadmap progress and profile entries to provide personalized skill recommendations and track your graduation readiness.',
+                'Data Usage Policy',
+                'CareerCoach utilizes your trajectory and profile benchmarks to synthesize personalized roadmap optimizations and track verified graduation readiness indices.',
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
             const SizedBox(height: 12),
             _buildSecurityTile(
               context,
               icon: LucideIcons.history,
-              title: 'Clear Search History',
-              subtitle: 'Remove all previous roadmap searches',
-              onTap: () => _showActionSnackBar(
-                context,
-                'Search history cleared successfully!',
-              ),
-              isDark: isDark,
-              cardColor: cardColor,
+              title: 'Purge Search Records',
+              subtitle: 'Remove all historical roadmap queries',
+              onTap: () =>
+                  _showActionSnackBar(context, 'Search archives purged!'),
             ),
             const SizedBox(height: 12),
             _buildSecurityTile(
               context,
               icon: LucideIcons.eye,
-              title: 'Account Data Access',
-              subtitle: 'Request a copy of your personal data',
-              onTap: () => _showActionSnackBar(
-                context,
-                'Data request sent to your email!',
-              ),
-              isDark: isDark,
-              cardColor: cardColor,
+              title: 'Data Portability',
+              subtitle: 'Request a secure copy of your logs',
+              onTap: () =>
+                  _showActionSnackBar(context, 'Data synthesis initiated!'),
             ),
 
             const SizedBox(height: 32),
-            _buildSectionHeader(context, 'Legal', isDark),
+            _buildSectionHeader(context, 'Legal Framework'),
             const SizedBox(height: 16),
             _buildSecurityTile(
               context,
               icon: LucideIcons.fileText,
-              title: 'Privacy Policy',
-              subtitle: 'Read our latest privacy terms',
+              title: 'Privacy Manifesto',
+              subtitle: 'Our latest data protection terms',
               onTap: () => _showInfoDialog(
                 context,
-                'Privacy Policy',
-                'Your privacy is our priority. We do not sell your data to third parties. All personal roadmaps are encrypted and stored securely.\n\nRead full policy at: careercoach.app/privacy',
+                'Privacy Manifesto',
+                'Your privacy is our core mandate. We operate on a zero-sale data policy. All career trajectories are end-to-end encrypted.\n\nRead full manifesto at: careercoach.app/privacy',
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
             const SizedBox(height: 12),
             _buildSecurityTile(
               context,
               icon: LucideIcons.layers,
-              title: 'Terms & Conditions',
-              subtitle: 'App usage rules and guidelines',
+              title: 'Terms of Engagement',
+              subtitle: 'Service rules and user obligations',
               onTap: () => _showInfoDialog(
                 context,
-                'Terms & Conditions',
-                'By using CareerCoach, you agree to our mentorship guidelines and academic integrity standards for roadmap tracking.\n\nFull terms: careercoach.app/terms',
+                'Engagement Terms',
+                'By utilizing the ecosystem, you adhere to our mentorship protocols and academic integrity frameworks for validated roadmap execution.\n\nFull terms: careercoach.app/legal',
               ),
-              isDark: isDark,
-              cardColor: cardColor,
             ),
             const SizedBox(height: 48),
           ],
@@ -156,14 +135,17 @@ class PrivacySecurityScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, bool isDark) {
-    return Text(
-      title.toUpperCase(),
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.bold,
-        color: isDark ? Colors.grey[400] : Colors.grey[500],
-        letterSpacing: 1.2,
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(left: 4),
+      child: Text(
+        title.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.5,
+        ),
       ),
     );
   }
@@ -175,79 +157,109 @@ class PrivacySecurityScreen extends StatelessWidget {
     required String subtitle,
     Widget? trailing,
     VoidCallback? onTap,
-    required bool isDark,
-    required Color? cardColor,
   }) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.05)
-              : Colors.grey[100]!,
-        ),
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(24),
+        border: theme.cardTheme.shape is RoundedRectangleBorder
+            ? Border.fromBorderSide(
+                (theme.cardTheme.shape as RoundedRectangleBorder).side,
+              )
+            : null,
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 10,
+        ),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppConstants.primaryColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: colors.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(icon, color: AppConstants.primaryColor, size: 22),
+          child: Icon(icon, color: colors.primary, size: 24),
         ),
         title: Text(
           title,
-          style: TextStyle(
+          style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(
-            color: isDark ? Colors.grey[400] : Colors.grey[500],
-            fontSize: 12,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colors.onSurface.withValues(alpha: 0.5),
           ),
         ),
         trailing:
             trailing ??
             Icon(
               LucideIcons.chevronRight,
-              color: isDark ? Colors.grey[600] : Colors.grey[300],
+              color: colors.onSurface.withValues(alpha: 0.3),
               size: 20,
             ),
         onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
     );
   }
 
   void _showActionSnackBar(BuildContext context, String message) {
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+          style: TextStyle(
+            color: theme.colorScheme.onPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: AppConstants.primaryColor,
+        margin: const EdgeInsets.all(16),
+        backgroundColor: theme.colorScheme.primary,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     );
   }
 
   void _showInfoDialog(BuildContext context, String title, String content) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(content),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: theme.cardTheme.color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Text(
+          title,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          content,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colors.onSurface.withValues(alpha: 0.7),
+            height: 1.5,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(
+              'Acknowledge',
+              style: TextStyle(
+                color: colors.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),

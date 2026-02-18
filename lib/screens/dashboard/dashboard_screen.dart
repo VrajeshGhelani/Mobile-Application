@@ -60,7 +60,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final userProvider = context.watch<UserProvider>();
     final authService = context.watch<AuthService>();
 
-    // Sync UserProvider if it's empty but AuthService has a user
     if (userProvider.user == null && authService.currentUser != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<UserProvider>().setUser(authService.currentUser!);
@@ -71,18 +70,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final firstName = user?.name.split(' ').first ?? 'Developer';
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final cardColor = theme.cardTheme.color;
+    final colors = theme.colorScheme;
 
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding,
+            vertical: 20,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              // Welcome Message
+              // --- Welcome Header ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -91,46 +91,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       Text(
                         'Welcome back,',
-                        style: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 16,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       Text(
                         '$firstName! 👋',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ],
                   ),
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundColor: AppConstants.primaryColor.withValues(
-                      alpha: 0.2,
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: colors.primary.withValues(alpha: 0.2),
+                        width: 2,
+                      ),
                     ),
-                    child: const Icon(
-                      LucideIcons.user,
-                      color: AppConstants.primaryColor,
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundColor: colors.primary.withValues(alpha: 0.1),
+                      child: Icon(
+                        LucideIcons.user,
+                        color: colors.primary,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 32),
-              // Step 3: Functional Search Bar
+
+              // --- Modern Search Bar ---
               Container(
                 decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(16),
+                  color: theme.cardTheme.color,
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(
-                        alpha: isDark ? 0.3 : 0.05,
-                      ),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: colors.shadow.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -141,87 +146,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       _searchQuery = value;
                     });
                   },
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
                   decoration: InputDecoration(
-                    hintText: 'Search for roadmaps...',
-                    hintStyle: TextStyle(
-                      color: isDark ? Colors.grey[500] : Colors.grey[400],
-                    ),
+                    hintText: 'Search career roadmaps...',
                     prefixIcon: Icon(
                       LucideIcons.search,
-                      color: isDark ? Colors.grey[500] : Colors.grey[400],
+                      color: colors.primary.withValues(alpha: 0.6),
                       size: 20,
                     ),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: Icon(
-                              LucideIcons.x,
-                              color: isDark
-                                  ? Colors.grey[500]
-                                  : Colors.grey[400],
-                              size: 18,
-                            ),
+                            icon: const Icon(LucideIcons.x, size: 18),
                             onPressed: () {
                               _searchController.clear();
-                              setState(() {
-                                _searchQuery = '';
-                              });
+                              setState(() => _searchQuery = '');
                             },
                           )
                         : null,
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide(color: colors.primary, width: 2),
                     ),
+                    filled: false,
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
-              // Filter Section
+              const SizedBox(height: 24),
+
+              // --- Filter Chips ---
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: ['All', 'Tech', 'Medical', 'Commerce'].map((field) {
                     final isSelected = _selectedField == field;
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.only(right: 10),
                       child: FilterChip(
                         label: Text(field),
                         selected: isSelected,
                         onSelected: (selected) {
                           setState(() => _selectedField = field);
                         },
-                        selectedColor: AppConstants.primaryColor.withValues(
-                          alpha: 0.2,
-                        ),
-                        checkmarkColor: AppConstants.primaryColor,
-                        labelStyle: TextStyle(
-                          color: isSelected
-                              ? AppConstants.primaryColor
-                              : isDark
-                              ? Colors.grey[400]
-                              : Colors.grey[600],
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                        backgroundColor: cardColor,
+                        showCheckmark: false,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 12,
                           vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            color: isSelected
-                                ? AppConstants.primaryColor
-                                : isDark
-                                ? Colors.white.withValues(alpha: 0.1)
-                                : Colors.grey[200]!,
-                          ),
                         ),
                       ),
                     );
@@ -229,48 +199,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              // Section Header
-              Text(
-                'Explore Career Domains',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+
+              // --- Grid Header ---
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Explore Domains',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'See All',
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              // Step 4: Domain Grid / No Results UI
+
+              // --- Results Grid ---
               _filteredCache.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        padding: const EdgeInsets.symmetric(vertical: 60),
                         child: Column(
                           children: [
-                            Icon(
-                              LucideIcons.searchX,
-                              size: 64,
-                              color: isDark
-                                  ? Colors.grey[800]
-                                  : Colors.grey[300],
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: colors.surfaceContainerHighest
+                                    .withValues(alpha: 0.3),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                LucideIcons.searchX,
+                                size: 48,
+                                color: colors.onSurfaceVariant.withValues(
+                                  alpha: 0.5,
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 20),
                             Text(
-                              'No roadmaps found for "$_searchQuery"',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.grey[500]
-                                    : Colors.grey[500],
-                                fontSize: 16,
+                              'Oops! No results found',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Try searching for another domain or field.',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.grey[600]
-                                    : Colors.grey[400],
-                                fontSize: 13,
+                              'Try searching for something else.',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.onSurface.withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -285,15 +272,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 16,
                             mainAxisSpacing: 16,
-                            childAspectRatio: 0.85,
+                            childAspectRatio: 0.82,
                           ),
                       itemCount: _filteredCache.length,
                       itemBuilder: (context, index) {
-                        return _buildDomainCard(
-                          _filteredCache[index],
-                          isDark,
-                          cardColor,
-                        );
+                        return _buildDomainCard(_filteredCache[index], theme);
                       },
                     ),
               const SizedBox(height: 32),
@@ -303,34 +286,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: colors.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, -5),
+              color: colors.shadow.withValues(alpha: 0.1),
+              blurRadius: 30,
+              offset: const Offset(0, -10),
             ),
           ],
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
+          backgroundColor: colors.surface,
+          selectedItemColor: colors.primary,
+          unselectedItemColor: colors.onSurface.withValues(alpha: 0.6),
           onTap: (index) {
             setState(() => _currentIndex = index);
             if (index == 1) context.push('/progress');
             if (index == 2) context.push('/profile');
             if (index == 3) context.push('/settings');
           },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Theme.of(
-            context,
-          ).bottomNavigationBarTheme.backgroundColor,
-          selectedItemColor: AppConstants.primaryColor,
-          unselectedItemColor: isDark ? Colors.grey[600] : Colors.grey[400],
-          showUnselectedLabels: true,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
           items: const [
             BottomNavigationBarItem(
               icon: Icon(LucideIcons.home),
@@ -354,23 +329,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildDomainCard(CareerDomain domain, bool isDark, Color? cardColor) {
+  Widget _buildDomainCard(CareerDomain domain, ThemeData theme) {
+    final colors = theme.colorScheme;
     return InkWell(
       onTap: () => context.push('/roadmap/${domain.id}'),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: cardColor,
+          color: theme.cardTheme.color,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.grey[100]!,
-          ),
+          border: theme.cardTheme.shape is RoundedRectangleBorder
+              ? Border.fromBorderSide(
+                  (theme.cardTheme.shape as RoundedRectangleBorder).side,
+                )
+              : null,
           boxShadow: [
             BoxShadow(
-              color: domain.color.withValues(alpha: isDark ? 0.05 : 0.1),
-              blurRadius: 15,
+              color: domain.color.withValues(alpha: 0.08),
+              blurRadius: 20,
               offset: const Offset(0, 8),
             ),
           ],
@@ -381,7 +358,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: domain.color.withValues(alpha: 0.15),
+                color: domain.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(domain.icon, color: domain.color, size: 28),
@@ -389,23 +366,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const Spacer(),
             Text(
               domain.name,
-              style: TextStyle(
+              style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: isDark ? Colors.white : Colors.black87,
+                height: 1.2,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
-            Text(
-              domain.description,
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[500],
-                fontSize: 11,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    domain.field,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: colors.primary,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  LucideIcons.chevronRight,
+                  size: 16,
+                  color: colors.primary.withValues(alpha: 0.5),
+                ),
+              ],
             ),
           ],
         ),

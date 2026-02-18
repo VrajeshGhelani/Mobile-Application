@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (mounted) {
       final authService = context.read<AuthService>();
-      // Navigate to Login by default as per requirement,
+      // to Login by default as per requirement,
       // but keep the logic for dashboard if already logged in for UX.
       if (authService.isAuthenticated) {
         context.go('/dashboard');
@@ -64,19 +64,18 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: AppConstants.backgroundColor,
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              AppConstants.primaryColor,
-              AppConstants.primaryColor.withAlpha(200),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            colors: [colors.primary, colors.secondary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         child: FadeTransition(
@@ -86,51 +85,73 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo
+                // --- Premium Logo Container ---
                 Container(
-                  width: 120,
-                  height: 120,
+                  width: 140,
+                  height: 140,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(25),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
                   ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Fallback icon if image fails to load
-                        return const Icon(
-                          Icons.rocket_launch,
-                          size: 60,
-                          color: AppConstants.primaryColor,
-                        );
-                      },
+                  child: Center(
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 30,
+                            offset: Offset(0, 15),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Icon(
+                          Icons.rocket_launch_rounded,
+                          size: 50,
+                          color: colors.primary,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                // App Name
+                const SizedBox(height: 32),
+
+                // --- Animated Text ---
                 Text(
                   AppConstants.appName,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  style: theme.textTheme.headlineMedium?.copyWith(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1,
                   ),
                 ),
-                const SizedBox(height: 48),
-                // Circular Progress Indicator
-                const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 3,
+                const SizedBox(height: 8),
+                Text(
+                  'Accelerating Careers.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 80),
+
+                // --- Loading UI ---
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    strokeWidth: 2,
+                  ),
                 ),
               ],
             ),

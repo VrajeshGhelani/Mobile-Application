@@ -14,8 +14,6 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
     final userProvider = context.watch<UserProvider>();
-
-    // Use UserProvider as primary source, fallback to AuthService if UserProvider is not yet populated
     final user = userProvider.user ?? authService.currentUser;
 
     if (user == null) {
@@ -24,29 +22,35 @@ class ProfileScreen extends StatelessWidget {
       );
     }
 
-    // Sync UserProvider if it's empty but AuthService has a user
     if (userProvider.user == null && authService.currentUser != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<UserProvider>().setUser(authService.currentUser!);
       });
     }
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'My Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        title: Text('My Profile', style: theme.textTheme.titleLarge),
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
+        actions: [
+          IconButton(
+            icon: Icon(LucideIcons.settings, color: colors.onSurface),
+            onPressed: () => context.push('/settings'),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.defaultPadding,
+          vertical: 20,
+        ),
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            // Avatar & Name
+            // --- Premium Avatar Section ---
             Center(
               child: Column(
                 children: [
@@ -54,82 +58,111 @@ class ProfileScreen extends StatelessWidget {
                     alignment: Alignment.bottomRight,
                     children: [
                       Container(
-                        width: 120,
-                        height: 120,
+                        width: 130,
+                        height: 130,
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppConstants.primaryColor,
-                            width: 4,
+                          gradient: LinearGradient(
+                            colors: [colors.primary, colors.secondary],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              'https://api.dicebear.com/7.x/avataaars/png?seed=CareerCoach',
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: theme.scaffoldBackgroundColor,
+                              width: 4,
                             ),
-                            fit: BoxFit.cover,
+                            image: const DecorationImage(
+                              image: NetworkImage(
+                                'https://api.dicebear.com/7.x/avataaars/png?seed=CareerCoach',
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: const BoxDecoration(
-                          color: AppConstants.primaryColor,
+                        decoration: BoxDecoration(
+                          color: colors.primary,
                           shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.scaffoldBackgroundColor,
+                            width: 3,
+                          ),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           LucideIcons.edit2,
-                          color: Colors.white,
-                          size: 16,
+                          color: colors.onPrimary,
+                          size: 14,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text(
                     user.name,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: colors.onSurface,
                     ),
                   ),
-                  Text(
-                    user.email,
-                    style: TextStyle(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      fontSize: 14,
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      user.email,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 48),
-            // Info Sections
+            const SizedBox(height: 40),
+
+            // --- Info Cards ---
             _buildProfileItem(
               context,
               icon: LucideIcons.briefcase,
               label: 'Career Domain',
               value: user.careerDomain,
-              color: Colors.blue,
+              accentColor: colors.primary,
             ),
             const SizedBox(height: 16),
             _buildProfileItem(
               context,
               icon: LucideIcons.mail,
-              label: 'Email Address',
+              label: 'Personal Email',
               value: user.email,
-              color: Colors.orange,
+              accentColor: colors.tertiary.withValues(
+                alpha: 0.8,
+              ), // Using tertiary instead of orange
             ),
             const SizedBox(height: 16),
             _buildProfileItem(
               context,
               icon: LucideIcons.shieldCheck,
-              label: 'Account Status',
-              value: 'Verified Professional',
-              color: Colors.green,
+              label: 'Account Type',
+              value: 'Verified Scholar',
+              accentColor: colors.primary, // Using primary instead of green
             ),
-            const SizedBox(height: 48),
-            // Edit Profile Button
+            const SizedBox(height: 40),
+
+            // --- Action Buttons ---
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -139,34 +172,28 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppConstants.primaryColor,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 56),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              child: const Text(
-                'Edit Profile',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              child: const Text('Edit Profile Information'),
             ),
             const SizedBox(height: 16),
-            // Logout Button
-            TextButton(
+            OutlinedButton(
               onPressed: () {
                 authService.logout();
                 context.go('/login');
               },
-              child: const Text(
-                'Logout Account',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colors.error,
+                side: BorderSide(color: colors.error.withValues(alpha: 0.5)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(LucideIcons.logOut, size: 18, color: colors.error),
+                  const SizedBox(width: 10),
+                  const Text('Logout Account'),
+                ],
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -178,49 +205,66 @@ class ProfileScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required String value,
-    required Color color,
+    required Color accentColor,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? Colors.white.withAlpha(20) : Colors.grey[100]!,
-        ),
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(24),
+        border: theme.cardTheme.shape is RoundedRectangleBorder
+            ? Border.fromBorderSide(
+                (theme.cardTheme.shape as RoundedRectangleBorder).side,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: accentColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: accentColor, size: 22),
           ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: isDark ? Colors.grey[500] : Colors.grey[500],
-                  fontSize: 12,
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colors.onSurface.withValues(alpha: 0.4),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
                 ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: isDark ? Colors.white : Colors.black87,
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+          Icon(
+            LucideIcons.chevronRight,
+            size: 18,
+            color: colors.onSurface.withValues(alpha: 0.2),
           ),
         ],
       ),

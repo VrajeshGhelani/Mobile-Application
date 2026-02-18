@@ -1,42 +1,65 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
 class AuthService extends ChangeNotifier {
-  bool _isAuthenticated = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   UserModel? _currentUser;
 
-  bool get isAuthenticated => _isAuthenticated;
+  AuthService() {
+    // Listen to authentication state changes
+    _auth.authStateChanges().listen((User? user) {
+      if (user != null) {
+        _currentUser = UserModel(
+          id: user.uid,
+          email: user.email ?? '',
+          name: user.displayName ?? user.email?.split('@')[0] ?? 'User',
+        );
+      } else {
+        _currentUser = null;
+      }
+      notifyListeners();
+    });
+  }
+
+  bool get isAuthenticated => _auth.currentUser != null;
   UserModel? get currentUser => _currentUser;
 
-  Future<bool> login(String email, String password) async {
-    // Dummy authentication logic
-    await Future.delayed(const Duration(seconds: 1));
-    if (email.isNotEmpty && password.length >= 6) {
-      _isAuthenticated = true;
-      _currentUser = UserModel(
-        id: '1',
+  Future<String?> login(String email, String password) async {
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null; // Success
+    } on FirebaseAuthException catch (e) {
+      return e.message; // Return error message
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  Future<String?> register(String name, String email, String password) async {
+    try {
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
-        name: email.split('@')[0],
+        password: password,
       );
+
+      // Update the user's display name
+      await result.user?.updateDisplayName(name);
+
+      // Update local current user
+      _currentUser = UserModel(id: result.user!.uid, email: email, name: name);
+
       notifyListeners();
-      return true;
+      return null; // Success
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    } catch (e) {
+      return e.toString();
     }
-    return false;
   }
 
-  Future<bool> register(String name, String email, String password) async {
-    await Future.delayed(const Duration(seconds: 1));
-    if (email.isNotEmpty && password.length >= 6) {
-      _isAuthenticated = true;
-      _currentUser = UserModel(id: '1', email: email, name: name);
-      notifyListeners();
-      return true;
-    }
-    return false;
-  }
-
-  void logout() {
-    _isAuthenticated = false;
+  Future<void> logout() async {
+    await _auth.signOut();
     _currentUser = null;
     notifyListeners();
   }

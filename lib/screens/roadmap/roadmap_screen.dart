@@ -25,6 +25,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<RoadmapProvider>();
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     if (provider.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -35,69 +37,83 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
       return const Scaffold(body: Center(child: Text('Domain not found')));
     }
 
-    // Calculate progress for this domain
     final completedSteps = domain.steps.where((s) => s.isCompleted).length;
     final totalSteps = domain.steps.length;
     final progress = totalSteps > 0 ? completedSteps / totalSteps : 0.0;
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final cardColor = theme.cardTheme.color;
-
     return Scaffold(
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            expandedHeight: 180,
+            expandedHeight: 200,
             pinned: true,
+            stretch: true,
+            backgroundColor: colors.surface,
+            foregroundColor: colors.onSurface,
             leading: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                color: Colors.white,
-                size: 20,
+              icon: Icon(
+                LucideIcons.chevronLeft,
+                color: colors.onSurface,
+                size: 28,
               ),
               onPressed: () => Navigator.pop(context),
             ),
             flexibleSpace: FlexibleSpaceBar(
+              stretchModes: const [
+                StretchMode.zoomBackground,
+                StretchMode.blurBackground,
+              ],
               title: Text(
                 domain.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  fontSize: 18,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colors.onSurface,
+                  letterSpacing: -0.5,
                 ),
               ),
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [domain.color, domain.color.withValues(alpha: 0.7)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          domain.color,
+                          domain.color.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Icon(
-                    domain.icon,
-                    size: 80,
-                    color: Colors.white.withValues(alpha: 0.2),
+                  Positioned(
+                    right: -20,
+                    bottom: -20,
+                    child: Icon(
+                      domain.icon,
+                      size: 160,
+                      color: colors.onPrimary.withValues(alpha: 0.15),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
-          // Progress Section
+
+          // --- Progress Insight Card ---
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(AppConstants.defaultPadding),
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(20),
+                color: theme.cardTheme.color,
+                borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: colors.shadow.withValues(alpha: 0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
@@ -107,48 +123,52 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Roadmap Progress',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'PATHWAY PROGRESS',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colors.onSurface.withValues(alpha: 0.4),
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Keep going, ${((1 - progress) * 10).toInt()} steps left!',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
                       ),
                       Text(
                         '${(progress * 100).toInt()}%',
-                        style: TextStyle(
+                        style: theme.textTheme.headlineMedium?.copyWith(
                           color: domain.color,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 20),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: isDark
-                          ? Colors.grey[800]
-                          : Colors.grey[200],
+                      backgroundColor: colors.surfaceContainerHighest
+                          .withValues(alpha: 0.5),
                       color: domain.color,
-                      minHeight: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '$completedSteps of $totalSteps steps completed',
-                    style: TextStyle(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
-                      fontSize: 13,
+                      minHeight: 12,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          // Step List
+
+          // --- Interactive Roadmap Timeline ---
           SliverPadding(
             padding: const EdgeInsets.symmetric(
               horizontal: AppConstants.defaultPadding,
@@ -164,13 +184,11 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                   isLast,
                   provider,
                   domain,
-                  isDark,
-                  cardColor,
                 );
               }, childCount: domain.steps.length),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 40)),
+          const SliverToBoxAdapter(child: SizedBox(height: 60)),
         ],
       ),
     );
@@ -183,136 +201,166 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     bool isLast,
     RoadmapProvider provider,
     CareerDomain domain,
-    bool isDark,
-    Color? cardColor,
   ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final isCompleted = step.isCompleted;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Timeline connector
+        // --- Custom Timeline Component ---
         Column(
           children: [
-            Container(
-              width: 28,
-              height: 28,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
-                color: isCompleted
-                    ? Colors.green
-                    : (isDark ? Colors.grey[900] : Colors.white),
+                color: isCompleted ? colors.primary : colors.surface,
                 shape: BoxShape.circle,
                 border: Border.all(
                   color: isCompleted
-                      ? Colors.green
-                      : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
-                  width: 2,
+                      ? colors.primary
+                      : colors.outline.withValues(alpha: 0.3),
+                  width: 2.5,
                 ),
+                boxShadow: isCompleted
+                    ? [
+                        BoxShadow(
+                          color: colors.primary.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ]
+                    : null,
               ),
               child: isCompleted
-                  ? const Icon(Icons.check, size: 16, color: Colors.white)
-                  : null,
+                  ? Icon(LucideIcons.check, size: 16, color: colors.onPrimary)
+                  : Center(
+                      child: Text(
+                        '${index + 1}',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.5),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
             ),
             if (!isLast)
               Container(
-                width: 2,
-                height: 110,
-                color: isCompleted
-                    ? Colors.green.withValues(alpha: 0.3)
-                    : (isDark ? Colors.grey[800] : Colors.grey[200]),
+                width: 3,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: isCompleted
+                      ? colors.primary.withValues(alpha: 0.3)
+                      : colors.outline.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(1.5),
+                ),
               ),
           ],
         ),
-        const SizedBox(width: 16),
-        // Step Details Card
+        const SizedBox(width: 20),
+
+        // --- Modern Step Card ---
         Expanded(
           child: Container(
-            margin: const EdgeInsets.only(bottom: 24),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(16),
+              color: theme.cardTheme.color,
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isCompleted
-                    ? Colors.green.withValues(alpha: 0.2)
-                    : (isDark
-                          ? Colors.white.withValues(alpha: 0.05)
-                          : Colors.grey[100]!),
+                    ? colors.primary.withValues(alpha: 0.2)
+                    : colors.outline.withValues(alpha: 0.1),
+                width: 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: colors.shadow.withValues(alpha: 0.02),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        step.title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          decoration: isCompleted
-                              ? TextDecoration.lineThrough
-                              : null,
-                          color: isCompleted
-                              ? Colors.grey
-                              : (isDark ? Colors.white : Colors.black87),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        step.description,
-                        style: TextStyle(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
-                          fontSize: 13,
-                        ),
-                      ),
-                      if (step.certification != null) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            step.title,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                              color: isCompleted
+                                  ? colors.onSurface.withValues(alpha: 0.4)
+                                  : colors.onSurface,
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            color: domain.color.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
+                          const SizedBox(height: 6),
+                          Text(
+                            step.description,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.onSurface.withValues(alpha: 0.6),
+                              height: 1.4,
+                            ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.award,
-                                size: 14,
-                                color: domain.color,
-                              ),
-                              const SizedBox(width: 6),
-                              Flexible(
-                                child: Text(
-                                  step.certification!,
-                                  style: TextStyle(
-                                    color: domain.color,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                    ),
+                    Transform.scale(
+                      scale: 1.1,
+                      child: Checkbox(
+                        value: isCompleted,
+                        activeColor: colors.primary,
+                        checkColor: colors.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        onChanged: (_) => provider.toggleStep(domain.id, index),
+                      ),
+                    ),
+                  ],
+                ),
+                if (step.certification != null) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: domain.color.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(LucideIcons.award, size: 16, color: domain.color),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            step.certification!,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: domain.color,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                Checkbox(
-                  value: isCompleted,
-                  activeColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  onChanged: (_) => provider.toggleStep(domain.id, index),
-                ),
+                ],
               ],
             ),
           ),

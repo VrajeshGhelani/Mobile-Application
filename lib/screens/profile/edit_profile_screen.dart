@@ -55,13 +55,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         careerDomain: _selectedDomain,
       );
 
+      final theme = Theme.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Profile updated successfully!'),
-          backgroundColor: AppConstants.primaryColor,
+          content: Text(
+            'Profile updated successfully! 🎉',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: theme.colorScheme.primary,
           behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
       );
@@ -72,89 +80,105 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Edit Profile',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Edit Profile', style: theme.textTheme.titleLarge),
+        backgroundColor: colors.surface,
+        foregroundColor: colors.onSurface,
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_back_ios_new,
-            size: 20,
-            color: isDark ? Colors.white : Colors.black87,
+            LucideIcons.chevronLeft,
+            size: 24,
+            color: colors.onSurface,
           ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.defaultPadding,
+          vertical: 20,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // --- Avatar Edit ---
               Center(
                 child: Stack(
                   alignment: Alignment.bottomRight,
                   children: [
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 110,
+                      height: 110,
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppConstants.primaryColor,
-                          width: 3,
+                        gradient: LinearGradient(
+                          colors: [colors.primary, colors.secondary],
                         ),
-                        image: const DecorationImage(
-                          image: NetworkImage(
-                            'https://api.dicebear.com/7.x/avataaars/png?seed=CareerCoach',
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.scaffoldBackgroundColor,
+                            width: 3,
                           ),
-                          fit: BoxFit.cover,
+                          image: const DecorationImage(
+                            image: NetworkImage(
+                              'https://api.dicebear.com/7.x/avataaars/png?seed=CareerCoach',
+                            ),
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: AppConstants.primaryColor,
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colors.primary,
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.scaffoldBackgroundColor,
+                          width: 2,
+                        ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         LucideIcons.camera,
-                        color: Colors.white,
+                        color: colors.onPrimary,
                         size: 14,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              _buildLabel('Full Name'),
+              const SizedBox(height: 40),
+
+              _buildLabel('Full Name', theme),
               TextFormField(
                 controller: _nameController,
-                decoration: _buildInputDecoration(
-                  LucideIcons.user,
-                  'Enter your name',
+                decoration: const InputDecoration(
+                  hintText: 'Enter your name',
+                  prefixIcon: Icon(LucideIcons.user, size: 20),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
+                validator: (value) => (value == null || value.isEmpty)
+                    ? 'Please enter your name'
+                    : null,
               ),
-              const SizedBox(height: 20),
-              _buildLabel('Email Address'),
+              const SizedBox(height: 24),
+
+              _buildLabel('Email Address', theme),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: _buildInputDecoration(
-                  LucideIcons.mail,
-                  'Enter your email',
+                decoration: const InputDecoration(
+                  hintText: 'Enter your email',
+                  prefixIcon: Icon(LucideIcons.mail, size: 20),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -168,16 +192,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
-              _buildLabel('Career Domain'),
-              // Dynamically populated from CareerDomainData
+              const SizedBox(height: 24),
+
+              _buildLabel('Career Domain', theme),
               DropdownButtonFormField<String>(
                 initialValue: _selectedDomain,
-                decoration: _buildInputDecoration(
-                  LucideIcons.briefcase,
-                  'Select domain',
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(LucideIcons.briefcase, size: 20),
                 ),
-                isExpanded: true, // Prevents overflow
+                isExpanded: true,
                 items: _allDomains.map((domain) {
                   return DropdownMenuItem(
                     value: domain.name,
@@ -187,6 +210,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Flexible(
                           child: Text(
                             domain.name,
+                            style: theme.textTheme.bodyMedium,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -197,7 +221,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: domain.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             domain.field,
@@ -213,29 +237,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   );
                 }).toList(),
                 onChanged: (value) {
-                  if (value != null) {
-                    setState(() => _selectedDomain = value);
-                  }
+                  if (value != null) setState(() => _selectedDomain = value);
                 },
-                dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
               ),
               const SizedBox(height: 48),
+
               ElevatedButton(
                 onPressed: _saveProfile,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppConstants.primaryColor,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Save Changes',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Save Profile Changes'),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -243,40 +254,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildLabel(String label) {
+  Widget _buildLabel(String label, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(IconData icon, String hint) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return InputDecoration(
-      hintText: hint,
-      prefixIcon: Icon(icon, size: 20, color: AppConstants.primaryColor),
-      filled: true,
-      fillColor: isDark ? const Color(0xFF1E293B) : Colors.grey[50],
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: isDark ? Colors.white.withAlpha(20) : Colors.grey[200]!,
-        ),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: isDark ? Colors.white.withAlpha(20) : Colors.grey[200]!,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: AppConstants.primaryColor,
-          width: 2,
+        label.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
         ),
       ),
     );

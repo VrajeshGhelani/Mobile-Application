@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import '../utils/constants.dart';
 
 class ProgressCard extends StatelessWidget {
   final String title;
@@ -18,20 +17,23 @@ class ProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppConstants.primaryColor, Color(0xFF818CF8)],
+        gradient: LinearGradient(
+          colors: [colors.primary, colors.secondary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: AppConstants.primaryColor.withAlpha(77),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: colors.primary.withValues(alpha: 0.3),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
@@ -42,46 +44,49 @@ class ProgressCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                  title.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colors.onPrimary.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   description,
-                  style: TextStyle(
-                    color: Colors.white.withAlpha(204),
-                    fontSize: 14,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onPrimary.withValues(alpha: 0.8),
+                    height: 1.4,
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 16),
           CircularPercentIndicator(
-            radius: 40.0,
-            lineWidth: 8.0,
+            radius: 45.0,
+            lineWidth: 10.0,
             percent: percentage,
+            animation: true,
+            animationDuration: 1200,
             center: Text(
               "${(percentage * 100).toInt()}%",
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+              style: TextStyle(
+                color: colors.onPrimary,
+                fontWeight: FontWeight.w900,
+                fontSize: 18,
               ),
             ),
-            progressColor: Colors.white,
-            backgroundColor: Colors.white24,
+            progressColor: colors.onPrimary,
+            backgroundColor: colors.onPrimary.withValues(alpha: 0.2),
             circularStrokeCap: CircularStrokeCap.round,
           ),
         ],

@@ -22,9 +22,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Account'),
+        title: const Text('New Profile'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
           onPressed: () => context.pop(),
@@ -32,87 +35,143 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppConstants.defaultPadding),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding + 8,
+            vertical: 20,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Join CareerCoach',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppConstants.primaryColor,
-                ),
+              // --- Identity Section ---
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: colors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      Icons.rocket_launch_rounded,
+                      color: colors.primary,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Join CareerCoach',
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        Text(
+                          'Start your structured journey today.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Get structured roadmaps to your dream job',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 40),
-              _buildTextField(
+              const SizedBox(height: 48),
+
+              // --- Form Fields ---
+              _buildModernTextField(
                 controller: _nameController,
-                label: 'Full Name',
-                icon: Icons.person_outline,
+                label: 'Full Legal Name',
                 hint: 'John Doe',
+                icon: Icons.person_rounded,
               ),
-              const SizedBox(height: 20),
-              _buildTextField(
+              const SizedBox(height: 24),
+              _buildModernTextField(
                 controller: _emailController,
-                label: 'Email',
-                icon: Icons.email_outlined,
+                label: 'Professional Email',
                 hint: 'john@example.com',
+                icon: Icons.email_rounded,
                 keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 20),
-              _buildTextField(
+              const SizedBox(height: 24),
+              _buildModernTextField(
                 controller: _passwordController,
-                label: 'Password',
-                icon: Icons.lock_outline,
+                label: 'Secure Password',
                 hint: '••••••••',
+                icon: Icons.lock_rounded,
                 isPassword: true,
               ),
-              const SizedBox(height: 20),
-              _buildTextField(
+              const SizedBox(height: 24),
+              _buildModernTextField(
                 controller: _confirmPasswordController,
-                label: 'Confirm Password',
-                icon: Icons.lock_reset_outlined,
+                label: 'Confirm Security Key',
                 hint: '••••••••',
+                icon: Icons.lock_reset_rounded,
                 isPassword: true,
               ),
+
               if (_errorMessage != null)
                 Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 16,
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colors.error.withValues(alpha: 0.2),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 13),
-                      ),
-                    ],
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.error_rounded,
+                          color: colors.error,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              const SizedBox(height: 40),
+
+              const SizedBox(height: 48),
+
               CustomButton(
-                text: 'Register',
+                text: 'Create Professional Profile',
                 isLoading: _isLoading,
                 onPressed: () async {
                   if (_nameController.text.isEmpty ||
                       _emailController.text.isEmpty ||
                       _passwordController.text.isEmpty ||
                       _confirmPasswordController.text.isEmpty) {
-                    setState(() => _errorMessage = 'Please fill in all fields');
+                    setState(
+                      () => _errorMessage = 'All data points are required',
+                    );
                     return;
                   }
 
                   if (_passwordController.text !=
                       _confirmPasswordController.text) {
-                    setState(() => _errorMessage = 'Passwords do not match');
+                    setState(
+                      () => _errorMessage = 'Security keys do not match',
+                    );
                     return;
                   }
 
@@ -121,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     _errorMessage = null;
                   });
 
-                  final success = await context.read<AuthService>().register(
+                  final error = await context.read<AuthService>().register(
                     _nameController.text,
                     _emailController.text,
                     _passwordController.text,
@@ -130,13 +189,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   if (!context.mounted) return;
 
                   setState(() => _isLoading = false);
-                  if (success) {
+                  if (error == null) {
                     context.go('/dashboard');
                   } else {
-                    setState(() => _errorMessage = 'Registration failed');
+                    setState(() => _errorMessage = error);
                   }
                 },
               ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -144,7 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildModernTextField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -160,11 +220,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
       ),
     );
   }
