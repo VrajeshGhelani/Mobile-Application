@@ -4,6 +4,11 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'roadmap_provider.dart';
 import '../../utils/constants.dart';
 import '../../models/career_domain_model.dart';
+import '../../widgets/skill_card.dart';
+import '../../widgets/technology_card.dart';
+import '../../data/skill_recommendation_data.dart';
+import '../../data/domain_learning_duration.dart';
+import '../../data/domain_technology_data.dart';
 
 class RoadmapScreen extends StatefulWidget {
   final String roadmapId;
@@ -168,6 +173,9 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
             ),
           ),
 
+          // --- Domain Learning Duration Banner ---
+          _buildDomainDurationBanner(context, domain.id, colors),
+
           // --- Interactive Roadmap Timeline ---
           SliverPadding(
             padding: const EdgeInsets.symmetric(
@@ -188,8 +196,225 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               }, childCount: domain.steps.length),
             ),
           ),
+
+          // --- Technologies to Learn Section ---
+          _buildTechSection(context, domain.id, colors),
+
+          // --- Recommended Skills Section ---
+          _buildSkillsSection(context, domain.id, colors),
+
           const SliverToBoxAdapter(child: SizedBox(height: 60)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDomainDurationBanner(
+    BuildContext context,
+    String domainId,
+    ColorScheme colors,
+  ) {
+    final theme = Theme.of(context);
+    final duration = DomainLearningDuration.getDurationForDomain(domainId);
+
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppConstants.defaultPadding,
+          vertical: 8,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colors.primary.withValues(alpha: 0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.timer_outlined,
+                size: 20,
+                color: colors.primary,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ESTIMATED TIME TO BE JOB-READY',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.primary.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    duration,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTechSection(
+    BuildContext context,
+    String domainId,
+    ColorScheme colors,
+  ) {
+    final theme = Theme.of(context);
+    final techs = DomainTechnologyData.getTechnologiesForDomain(domainId);
+
+    if (techs.isEmpty)
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+    final isDark = theme.brightness == Brightness.dark;
+
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: isDark
+                ? [
+                    colors.surfaceContainerHighest.withValues(alpha: 0.3),
+                    colors.surface.withValues(alpha: 0.1),
+                  ]
+                : [colors.primary.withValues(alpha: 0.05), colors.surface],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 4,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: colors.primary,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'CORE TECHNOLOGIES & TOOLS',
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                      color: colors.onSurface.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Row(
+                children: techs
+                    .map((tech) => TechnologyCard(tech: tech))
+                    .toList(),
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkillsSection(
+    BuildContext context,
+    String domainId,
+    ColorScheme colors,
+  ) {
+    final skills = SkillRecommendationData.getSkillsForDomain(domainId);
+    final theme = Theme.of(context);
+
+    return SliverPadding(
+      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate([
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: colors.primary,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'RECOMMENDED SKILLS',
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                  color: colors.onSurface.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (skills.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerLow.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: colors.outline.withValues(alpha: 0.1),
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    LucideIcons.sparkles,
+                    size: 40,
+                    color: colors.onSurface.withValues(alpha: 0.2),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No skill recommendations available',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurface.withValues(alpha: 0.4),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            ...skills.map((skill) => SkillCard(skill: skill)),
+        ]),
       ),
     );
   }
